@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>AgriBot - Your Farming Assistant</title>
+    <style>
+        :root {
+            --primary-green: #2E7D32;
+            --light-green: #4CAF50;
+            --lighter-green: #8BC34A;
+            --background-green: #E8F5E9;
+            --dark-green: #1B5E20;
+            --text-dark: #333;
+            --text-light: #fff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--background-green);
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        .header {
+            background-color: var(--primary-green);
+            color: var(--text-light);
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .header h1 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .header h1 i {
+            font-size: 1.8rem;
+        }
+        
+        .chat-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            line-height: 1.4;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .user-message {
+            align-self: flex-end;
+            background-color: var(--light-green);
+            color: var(--text-light);
+            border-bottom-right-radius: 5px;
+        }
+        
+        .bot-message {
+            align-self: flex-start;
+            background-color: #f1f8e9;
+            color: var(--text-dark);
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .input-container {
+            padding: 15px;
+            background-color: var(--primary-green);
+            display: flex;
+            justify-content: center;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .input-wrapper {
+            display: flex;
+            width: 100%;
+            max-width: 800px;
+            gap: 10px;
+        }
+        
+        #user-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        #send-button {
+            background-color: var(--dark-green);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: background-color 0.3s;
+        }
+        
+        #send-button:hover {
+            background-color: var(--light-green);
+        }
+        
+        .typing-indicator {
+            align-self: flex-start;
+            background-color: #f1f8e9;
+            padding: 12px 18px;
+            border-radius: 18px;
+            display: none;
+            margin-bottom: 10px;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            float: left;
+            margin: 0 1px;
+            background-color: var(--lighter-green);
+            display: block;
+            border-radius: 50%;
+            opacity: 0.4;
+        }
+        
+        .typing-indicator span:nth-of-type(1) {
+            animation: typing 1s infinite;
+        }
+        
+        .typing-indicator span:nth-of-type(2) {
+            animation: typing 1s 0.33s infinite;
+        }
+        
+        .typing-indicator span:nth-of-type(3) {
+            animation: typing 1s 0.66s infinite;
+        }
+        
+        @keyframes typing {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .message {
+                max-width: 90%;
+            }
+            
+            .chat-container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><i class="fas fa-seedling seedling-icon me-2"></i>Agribot</h1>
+    </div>
+    
+    <div class="chat-container" id="chat-container">
+        <div class="message bot-message">
+            Hello! I'm AgriBot, your farming assistant. How can I help you with your agricultural questions today?
+        </div>
+    </div>
+    
+    <div class="input-container">
+        <div class="input-wrapper">
+            <input type="text" id="user-input" placeholder="Ask about farming, crops, livestock...">
+            <button id="send-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+    </div>
+    
+    <div class="typing-indicator" id="typing-indicator">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatContainer = document.getElementById('chat-container');
+            const userInput = document.getElementById('user-input');
+            const sendButton = document.getElementById('send-button');
+            const typingIndicator = document.getElementById('typing-indicator');
+            
+            // Agriculture knowledge base
+            const knowledgeBase = {
+                greetings: [
+                    "Hello! How can I assist with your farming needs today?",
+                    "Hi there! What agricultural questions can I help answer?",
+                    "Greetings! I'm here to help with all your farming queries."
+                ],
+                farewells: [
+                    "Happy farming! Come back if you have more questions.",
+                    "Goodbye! May your crops flourish and your harvests be plentiful.",
+                    "See you later! Wishing you success in all your agricultural endeavors."
+                ],
+                questions: {
+                    "crop rotation": "Crop rotation involves growing different types of crops in the same area across different seasons. This helps improve soil health, reduce pest and weed pressure, and increase crop yield. A typical rotation might include legumes followed by cereals and then root crops.",
+                    "organic farming": "Organic farming avoids synthetic pesticides and fertilizers, relying instead on natural methods like composting, crop rotation, and biological pest control. It focuses on sustainability and environmental health.",
+                    "soil preparation": "Proper soil preparation involves testing your soil pH, adding organic matter like compost, tilling to aerate the soil, and ensuring proper drainage. Different crops may require specific soil conditions.",
+                    "pest control": "Integrated Pest Management (IPM) combines biological, cultural, physical and chemical tools to manage pests economically while minimizing risks to people and the environment. This includes using beneficial insects, crop rotation, and targeted pesticide application.",
+                    "irrigation methods": "Common irrigation methods include drip irrigation (efficient water delivery to plant roots), sprinkler systems (simulating rainfall), and flood irrigation (covering the field with water). The best method depends on your crops, water availability, and landscape.",
+                    "composting": "Composting transforms organic waste into nutrient-rich soil amendment. Layer green materials (kitchen scraps, grass clippings) with brown materials (dry leaves, straw), keep moist, and turn regularly. In 2-6 months, you'll have dark, crumbly compost.",
+                    "plant spacing": "Proper plant spacing ensures adequate light, nutrients, and air circulation. Follow seed packet recommendations, but generally: tomatoes 24-36 inches apart, carrots 2-3 inches, corn 12 inches, and lettuce 6-8 inches.",
+                    "fertilizer types": "Fertilizers provide essential nutrients (N-P-K: nitrogen, phosphorus, potassium). Organic options include compost, manure, and bone meal. Synthetic fertilizers offer precise nutrient ratios but may affect soil health long-term.",
+                    "harvest timing": "Harvest times vary by crop: lettuce when heads are firm, tomatoes when fully colored but firm, corn when silks are brown and kernels release milky fluid, root vegetables when tops begin to fade. Morning harvest often yields crisper produce.",
+                    "greenhouse management": "Greenhouses extend growing seasons. Key considerations: proper ventilation, temperature control (heating/cooling), humidity management, and adequate light. Monitor plants regularly for pests and diseases in the enclosed environment.",
+                    "who created you": "Shashank P created me"
+                },
+                default: [
+                    "I'm not sure about that specific agricultural topic. Could you rephrase your question or ask about something else?",
+                    "That's an interesting question. As a farming assistant, my expertise is mainly in crop cultivation, soil management, and sustainable practices. Could you ask something related to these areas?",
+                    "I don't have enough information on that specific topic yet. Try asking about crop rotation, pest control, soil preparation, or other common farming practices."
+                ]
+            };
+            
+            // Add event listeners
+            sendButton.addEventListener('click', handleUserMessage);
+            userInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    handleUserMessage();
+                }
+            });
+            
+            function handleUserMessage() {
+                const message = userInput.value.trim();
+                if (message) {
+                    addMessage(message, 'user');
+                    userInput.value = '';
+                    
+                    // Show typing indicator
+                    typingIndicator.style.display = 'block';
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                    
+                    // Simulate thinking delay
+                    setTimeout(() => {
+                        typingIndicator.style.display = 'none';
+                        const response = generateResponse(message);
+                        addMessage(response, 'bot');
+                    }, 1000 + Math.random() * 1000);
+                }
+            }
+            
+            function addMessage(text, sender) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message');
+                messageElement.classList.add(sender + '-message');
+                messageElement.textContent = text;
+                
+                chatContainer.appendChild(messageElement);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+            
+            function generateResponse(userMessage) {
+                const lowerCaseMessage = userMessage.toLowerCase();
+                
+                // Check for greetings
+                if (lowerCaseMessage.includes('hello') || lowerCaseMessage.includes('hi') || 
+                    lowerCaseMessage.includes('hey') || lowerCaseMessage.includes('greetings')) {
+                    return knowledgeBase.greetings[Math.floor(Math.random() * knowledgeBase.greetings.length)];
+                }
+                
+                // Check for farewells
+                if (lowerCaseMessage.includes('bye') || lowerCaseMessage.includes('goodbye') || 
+                    lowerCaseMessage.includes('see you') || lowerCaseMessage.includes('farewell')) {
+                    return knowledgeBase.farewells[Math.floor(Math.random() * knowledgeBase.farewells.length)];
+                }
+                
+                // Check for specific agricultural topics
+                for (const [key, value] of Object.entries(knowledgeBase.questions)) {
+                    if (lowerCaseMessage.includes(key)) {
+                        return value;
+                    }
+                }
+                
+                // Default response if no specific topic matched
+                return knowledgeBase.default[Math.floor(Math.random() * knowledgeBase.default.length)];
+            }
+        });
+    </script>
+</body>
+</html>

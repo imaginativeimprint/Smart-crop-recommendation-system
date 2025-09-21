@@ -1,0 +1,103 @@
+ <html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart crop Recommendation system</title>
+  <div class="logo">Smart crop Recommendation system</div>
+  <script>
+        function validatePassword() {
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirm-password").value;
+            const confirmPasswordField = document.getElementById("confirm-password");
+            const passwordError = document.getElementById("password-error");
+            const confirmError = document.getElementById("confirm-error");
+
+            // Password validation conditions
+            const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+            if (!passwordPattern.test(password)) {
+                passwordError.textContent = "Password must have at least 8 characters, including an uppercase, a lowercase, a number, and a special character.";
+                return false;
+            } 
+            else {
+                passwordError.textContent = "";
+            }
+
+            // Confirm password validation
+            if (password !== confirmPassword) {
+                confirmError.textContent = "Passwords do not match.";
+                confirmPasswordField.classList.add("error");
+                return false;
+            } 
+            else {
+                confirmError.textContent = "";
+                confirmPasswordField.classList.remove("error");
+            }
+
+            return true; // Everything is valid
+        }
+  </script>
+<style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      background: url('https://i.pinimg.com/736x/01/be/c0/01bec017041a071feab3c9701627f4f7.jpg') no-repeat center center fixed;
+      background-size: cover;
+      text-align: center;
+      padding: 20px;
+        }
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      display: inline-block;
+    }
+    input {
+      display: block;
+      margin: 40px auto;
+      padding: 8px;
+      width: 80%;
+    }
+    .logo {
+            font-size: 25px;
+            color:green;
+            font-weight: bold;
+            font-family: "Segoe Script";
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 10px;
+}
+    button {
+      padding: 10px 20px;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+</style>
+</head>
+
+<body>
+    <form>
+<h2>Please Register to continue</h2>
+    <input type="text" name="username" placeholder="Username" required>
+    <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
+    <input type="email" name="email" placeholder="Email" required>
+    <p>Enter Password:</p>
+    <input type="password" id="password" name="password" placeholder="Enter password" required>
+    <p id="password-error" style="color: red;"></p>
+    <br>
+    <p>Confirm Password:</p>
+    <input type="password" id="confirm-password" name="confirm-password" placeholder="Confirm password" required>
+    <p id="confirm-error" style="color: red;"></p>
+    <br><br>
+    <a type="Already-registered" href="login.html" value="Login">Login</a>
+    <button type="submit" value="Register">Register</button>
+</form>
+</body>
+</html>
