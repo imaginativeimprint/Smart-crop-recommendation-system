@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Crop Recommendation System</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f9f4;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        header {
+            background: linear-gradient(to right, #2e7d32, #4caf50);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+        }
+        
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .card-title {
+            color: #2e7d32;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e8f5e9;
+            font-size: 1.5rem;
+        }
+        
+        .map-container {
+            height: 450px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #388e3c;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #c8e6c9;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4caf50;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+        
+        button {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s;
+            width: 100%;
+        }
+        
+        button:hover {
+            background: #388e3c;
+        }
+        
+        .results {
+            display: none;
+            margin-top: 30px;
+            background: #e8f5e9;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid #4caf50;
+        }
+        
+        .results h3 {
+            color: #2e7d32;
+            margin-bottom: 15px;
+        }
+        
+        .crop-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .crop-icon {
+            font-size: 2rem;
+            color: #4caf50;
+        }
+        
+        .crop-info h4 {
+            color: #2e7d32;
+            margin-bottom: 5px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: #2e7d32;
+            color: white;
+            margin-top: 40px;
+        }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+        
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+            
+            .map-container {
+                height: 350px;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+        }
+        
+        .info-text {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+        
+        .soil-details {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .soil-badge {
+            background: #4caf50;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon"><i class="fas fa-seedling seedling-icon me-2"></i></div>
+                <h1>Smart Crop Recommendation System</h1>
+            </div>
+            <div>For Indian Farmers</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2 class="card-title">Select Your Farmland Location</h2>
+            <div class="info-text">
+                Select your farmland location on the map to get crop recommendations based on your soil type and regional climate conditions.
+            </div>
+            <div id="map" class="map-container"></div>
+            <p id="selected-location">Selected Location: Not selected yet</p>
+        </div>
+
+        <div class="two-column">
+            <div class="card">
+                <h2 class="card-title">Farm Details</h2>
+                <div class="form-group">
+                    <label for="state">State</label>
+                    <select id="state">
+                        <option value="">Select State</option>
+                        <option value="andhra">Andhra Pradesh</option>
+                        <option value="gujarat">Gujarat</option>
+                        <option value="karnataka">Karnataka</option>
+                        <option value="kerala">Kerala</option>
+                        <option value="maharastra">Maharashtra</option>
+                        <option value="punjab">Punjab</option>
+                        <option value="rajasthan">Rajasthan</option>
+                        <option value="tamilnadu">Tamil Nadu</option>
+                        <option value="up">Uttar Pradesh</option>
+                        <option value="westbengal">West Bengal</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="soil-type">Soil Type (Detected from location)</label>
+                    <input type="text" id="soil-type" readonly placeholder="Select location on map to detect soil type">
+                </div>
+                
+                <div class="form-group">
+                    <label for="land-size">Land Size (Acres)</label>
+                    <input type="number" id="land-size" min="0.1" step="0.1" placeholder="Enter land size in acres">
+                </div>
+                
+                <div class="form-group">
+                    <label for="water-availability">Water Availability</label>
+                    <select id="water-availability">
+                        <option value="high">High (Good irrigation facilities)</option>
+                        <option value="medium">Medium (Seasonal water availability)</option>
+                        <option value="low">Low (Limited water resources)</option>
+                    </select>
+                </div>
+                
+                <button id="recommend-btn">Get Crop Recommendations</button>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">Crop Recommendations</h2>
+                <div class="info-text">
+                    Based on your location, soil type, and farm size, we recommend the following crops:
+                </div>
+                
+                <div id="results" class="results">
+                    <h3>Recommended Crops for Your Farm</h3>
+                    <div id="crop-list">
+                        <!-- Crop recommendations will appear here -->
+                    </div>
+                    
+                    <div class="soil-details">
+                        <span class="soil-badge">Detected Soil: <span id="result-soil-type">Alluvial</span></span>
+                        <span class="soil-badge">Region: <span id="result-region">North India</span></span>
+                        <span class="soil-badge">Land Size: <span id="result-land-size">5</span> Acres</span>
+                    </div>
+                </div>
+                
+                <div id="no-results" class="info-text">
+                    Please select your location on the map and enter your farm details to get crop recommendations.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5>Smart Crop Advisory</h5>
+                    <p>Empowering small and marginal farmers with data-driven agricultural advice and support.</p>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="index.html" class="text-white">Home</a></li>
+                        <li><a href="#" class="text-white">Crop Advice</a></li>
+                        <li><a href="#weather-map-section" class="text-white">Weather</a></li>
+                        <li><a href="ai.html" class="text-white">AI-Chatbot</a></li>
+                        <li><a href="#" class="text-white">Market Prices</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5>Resources</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white">Government Schemes</a></li>
+                        <li><a href="#" class="text-white">Farming Techniques</a></li>
+                        <li><a href="#" class="text-white">Expert Consultation</a></li>
+                        <li><a href="#" class="text-white">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Contact Us</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-phone me-2"></i> Farmer Helpline: 1551</li>
+                        <li><i class="fas fa-envelope me-2"></i> support@smartcrop.gov.in</li>
+                        <li><i class="fas fa-map-marker-alt me-2"></i> Ministry of Agriculture, New Delhi</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="bg-light">
+            <div class="text-center">
+                <p>© 2025 Smart Crop Advisory System. Developed for the Government of India.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // Initialize map centered on India
+        const map = L.map('map').setView([20.5937, 78.9629], 5);
+        
+        // Add base map layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        // Add some sample markers for different regions
+        const regions = [
+            {lat: 20.5937, lng: 78.9629, name: "Central India", soil: "Black Soil"},
+            {lat: 28.7041, lng: 77.1025, name: "North India", soil: "Alluvial Soil"},
+            {lat: 13.0827, lng: 80.2707, name: "South India", soil: "Red Soil"},
+            {lat: 22.5726, lng: 88.3639, name: "East India", soil: "Laterite Soil"},
+            {lat: 23.2599, lng: 77.4126, name: "West India", soil: "Black Soil"}
+        ];
+        
+        regions.forEach(region => {
+            L.marker([region.lat, region.lng])
+                .addTo(map)
+                .bindPopup(`<b>${region.name}</b><br>Typical Soil: ${region.soil}`);
+        });
+        
+        // Variable to store user's selected location
+        let selectedLocation = null;
+        let selectedSoilType = "";
+        
+        // Add click event on map to select location
+        map.on('click', function(e) {
+            // Remove previous marker if exists
+            if (selectedLocation) {
+                map.removeLayer(selectedLocation);
+            }
+            
+            // Add new marker at clicked position
+            selectedLocation = L.marker(e.latlng).addTo(map)
+                .bindPopup("Selected Farm Location").openPopup();
+            
+            // Update selected location text
+            document.getElementById('selected-location').textContent = 
+                `Selected Location: Latitude ${e.latlng.lat.toFixed(4)}, Longitude ${e.latlng.lng.toFixed(4)}`;
+            
+            // Determine soil type based on region (simplified for demo)
+            if (e.latlng.lat > 21 && e.latlng.lat < 26 && e.latlng.lng > 74 && e.latlng.lng < 81) {
+                selectedSoilType = "Black Soil";
+            } else if (e.latlng.lat > 25 && e.latlng.lat < 32 && e.latlng.lng > 76 && e.latlng.lng < 85) {
+                selectedSoilType = "Alluvial Soil";
+            } else if (e.latlng.lat > 8 && e.latlng.lat < 21 && e.latlng.lng > 74 && e.latlng.lng < 83) {
+                selectedSoilType = "Red Soil";
+            } else if (e.latlng.lat > 8 && e.latlng.lat < 21 && e.latlng.lng > 83 && e.latlng.lng < 93) {
+                selectedSoilType = "Laterite Soil";
+            } else {
+                selectedSoilType = "Mixed Soil Type";
+            }
+            
+            // Update soil type field
+            document.getElementById('soil-type').value = selectedSoilType;
+        });
+        
+        // Crop database with soil preferences
+        const cropDatabase = [
+            {name: "Rice", soil: ["Alluvial", "Clayey"], water: "high", region: ["North", "East", "South"]},
+            {name: "Wheat", soil: ["Alluvial", "Loamy"], water: "medium", region: ["North", "Central"]},
+            {name: "Cotton", soil: ["Black", "Alluvial"], water: "medium", region: ["West", "Central"]},
+            {name: "Sugarcane", soil: ["Alluvial", "Black"], water: "high", region: ["North", "West", "South"]},
+            {name: "Maize", soil: ["Alluvial", "Red"], water: "medium", region: ["North", "Central", "South"]},
+            {name: "Pulses", soil: ["Red", "Black", "Alluvial"], water: "low", region: ["All"]},
+            {name: "Groundnut", soil: ["Red", "Sandy"], water: "low", region: ["West", "South"]},
+            {name: "Soybean", soil: ["Black", "Alluvial"], water: "medium", region: ["Central", "West"]},
+            {name: "Millets", soil: ["Red", "Sandy"], water: "low", region: ["South", "West"]},
+            {name: "Tea", soil: ["Laterite", "Red"], water: "high", region: ["North-East", "South"]},
+            {name: "Coffee", soil: ["Laterite", "Red"], water: "medium", region: ["South"]},
+            {name: "Spices", soil: ["Red", "Laterite"], water: "medium", region: ["South", "West"]}
+        ];
+        
+        // Get recommendation button
+        const recommendBtn = document.getElementById('recommend-btn');
+        recommendBtn.addEventListener('click', function() {
+            const landSize = document.getElementById('land-size').value;
+            const waterAvailability = document.getElementById('water-availability').value;
+            const state = document.getElementById('state').value;
+            
+            if (!selectedLocation || !landSize || !state) {
+                alert("Please select your location on map, enter land size, and select your state.");
+                return;
+            }
+            
+            // Determine region based on state selection
+            let region = "";
+            switch(state) {
+                case "punjab":
+                case "up":
+                case "rajasthan":
+                    region = "North";
+                    break;
+                case "gujarat":
+                case "maharastra":
+                    region = "West";
+                    break;
+                case "andhra":
+                case "karnataka":
+                case "tamilnadu":
+                case "kerala":
+                    region = "South";
+                    break;
+                default:
+                    region = "Central/East";
+            }
+            
+            // Filter crops based on soil type, water availability, and region
+            const recommendedCrops = cropDatabase.filter(crop => {
+                return crop.soil.includes(selectedSoilType.split(' ')[0]) && 
+                       crop.water === waterAvailability && 
+                       (crop.region.includes(region) || crop.region.includes("All"));
+            });
+            
+            // Display results
+            const resultsDiv = document.getElementById('results');
+            const noResultsDiv = document.getElementById('no-results');
+            const cropListDiv = document.getElementById('crop-list');
+            
+            if (recommendedCrops.length > 0) {
+                cropListDiv.innerHTML = '';
+                
+                recommendedCrops.forEach(crop => {
+                    const cropCard = document.createElement('div');
+                    cropCard.className = 'crop-card';
+                    cropCard.innerHTML = `
+                        <div class="crop-icon">🌾</div>
+                        <div class="crop-info">
+                            <h4>${crop.name}</h4>
+                            <p>Well-suited for ${selectedSoilType} with ${waterAvailability} water availability</p>
+                        </div>
+                    `;
+                    cropListDiv.appendChild(cropCard);
+                });
+                
+                // Update result details
+                document.getElementById('result-soil-type').textContent = selectedSoilType;
+                document.getElementById('result-region').textContent = region + " India";
+                document.getElementById('result-land-size').textContent = landSize;
+                
+                resultsDiv.style.display = 'block';
+                noResultsDiv.style.display = 'none';
+            } else {
+                resultsDiv.style.display = 'none';
+                noResultsDiv.style.display = 'block';
+                noResultsDiv.innerHTML = '<p>No specific crops found for your selection. Please try different parameters or consult with agricultural experts in your area.</p>';
+            }
+        });
+    </script>
+</body>
+</html>

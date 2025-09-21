@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Pest Detection System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --secondary: #4caf50;
+            --accent: #ff9800;
+            --light: #f5f9f4;
+            --dark: #1b5e20;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        
+        .navbar {
+            background: linear-gradient(to right, var(--dark), var(--primary));
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .hero-section {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1587049633312-d628ae50a8ae?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card {
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border: none;
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .card-header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 8px 8px 0 0 !important;
+            font-weight: 600;
+            padding: 12px 15px;
+            font-size: 0.95rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--dark);
+            border-color: var(--dark);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.8rem;
+        }
+        
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: #f9f9f9;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary);
+            background-color: #f0f9f0;
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }
+        
+        .upload-area:hover .upload-icon {
+            color: var(--primary);
+        }
+        
+        .pest-card {
+            border-left: 3px solid var(--primary);
+            transition: all 0.3s;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .pest-card.critical {
+            border-left: 3px solid #f44336;
+        }
+        
+        .pest-card.moderate {
+            border-left: 3px solid #ff9800;
+        }
+        
+        .pest-card.mild {
+            border-left: 3px solid #4caf50;
+        }
+        
+        .footer {
+            background: linear-gradient(to right, var(--dark), var(--primary));
+            color: white;
+            padding: 1.5rem 0;
+            margin-top: 2rem;
+            font-size: 0.9rem;
+        }
+        
+        .seasonal-table th {
+            background-color: var(--light);
+            padding: 8px;
+            font-size: 0.85rem;
+        }
+        
+        .seasonal-table td {
+            padding: 8px;
+            font-size: 0.85rem;
+        }
+        
+        #previewImage {
+            max-height: 300px;
+            object-fit: contain;
+        }
+        
+        .solution-card {
+            background-color: #e8f5e9;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .harm-level {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .harm-level.high {
+            background-color: #ffebee;
+            color: #f44336;
+        }
+        
+        .harm-level.medium {
+            background-color: #fff8e1;
+            color: #ffa000;
+        }
+        
+        .harm-level.low {
+            background-color: #e8f5e9;
+            color: #4caf50;
+        }
+        
+        .crop-type {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            background-color: #e3f2fd;
+            color: #1976d2;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-leaf me-2"></i>Krishi Pest Detect
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html"><i class="fas fa-home me-1"></i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="market.html"><i class="fas fa-chart-line me-1"></i> Market Prices</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#"><i class="fas fa-bug me-1"></i> Pest Detection</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-calendar-alt me-1"></i> Crop Calendar</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-user me-1"></i> Farmer Portal</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="container text-center">
+            <h1 class="fw-bold">Smart Pest Detection System</h1>
+            <p class="lead">Identify pests, diseases, and get natural treatment recommendations for your crops</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <!-- Left Sidebar -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-camera me-2"></i>Upload Pest Image
+                    </div>
+                    <div class="card-body">
+                        <div class="upload-area" id="uploadArea">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <p>Click to upload or drag & drop an image</p>
+                            <p class="small text-muted">Supported formats: JPG, PNG, WEBP (Max 5MB)</p>
+                            <input type="file" id="imageUpload" accept="image/*" class="d-none">
+                            <button class="btn btn-outline-primary mt-2" id="captureBtn">
+                                <i class="fas fa-camera me-2"></i>Capture Image
+                            </button>
+                        </div>
+                        
+                        <div class="text-center mt-3 d-none" id="imagePreviewContainer">
+                            <img src="" id="previewImage" class="img-fluid rounded" alt="Pest image preview">
+                            <div class="mt-2">
+                                <button class="btn btn-danger btn-sm" id="removeImageBtn">
+                                    <i class="fas fa-trash me-1"></i>Remove
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <label class="form-label">Or select a common pest:</label>
+                            <select class="form-select" id="commonPestSelect">
+                                <option value="">Select from common pests</option>
+                                <option value="aphids">Aphids</option>
+                                <option value="bollworm">Cotton Bollworm</option>
+                                <option value="leafminer">Leaf Miner</option>
+                                <option value="whitefly">Whitefly</option>
+                                <option value="mealybug">Mealybug</option>
+                                <option value="thrips">Thrips</option>
+                                <option value="mites">Spider Mites</option>
+                                <option value="locust">Locust</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <label class="form-label">Crop type (optional):</label>
+                            <select class="form-select" id="cropTypeSelect">
+                                <option value="">Select crop type</option>
+                                <option value="cereals">Cereals (Rice, Wheat, etc.)</option>
+                                <option value="pulses">Pulses</option>
+                                <option value="vegetables">Vegetables</option>
+                                <option value="fruits">Fruits</option>
+                                <option value="cash">Cash Crops (Cotton, Sugarcane)</option>
+                            </select>
+                        </div>
+                        
+                        <button class="btn btn-primary w-100 mt-3" id="detectPestBtn" disabled>
+                            <i class="fas fa-search me-2"></i>Detect Pest
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-history me-2"></i>Recent Detections
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No recent detections. Your scan history will appear here.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-bug me-2"></i>Pest Detection Results
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info" id="initialMessage">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Upload an image of a pest or select from common pests to get identification and treatment recommendations.
+                        </div>
+                        
+                        <div class="d-none" id="resultsContainer">
+                            <div class="row">
+                                <div class="col-md-4 text-center">
+                                    <img src="" id="resultImage" class="img-fluid rounded" alt="Detected pest">
+                                    <div class="mt-2">
+                                        <span class="harm-level high" id="harmLevel">High Harm</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <h4 id="pestName">Pest Name</h4>
+                                    <p id="pestScientific" class="text-muted">Scientific name</p>
+                                    <p id="pestDescription">Description of the pest will appear here.</p>
+                                    
+                                    <h5 class="mt-4">Affected Crops</h5>
+                                    <div id="affectedCrops">
+                                        <span class="crop-type">Tomato</span>
+                                        <span class="crop-type">Cotton</span>
+                                        <span class="crop-type">Chili</span>
+                                    </div>
+                                    
+                                    <h5 class="mt-4">Natural Control Methods</h5>
+                                    <div class="solution-card" id="naturalSolutions">
+                                        Natural solutions will appear here.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-calendar me-2"></i>Seasonal Pest Activity
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-sm seasonal-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Pest</th>
+                                                <th>Jan-Mar</th>
+                                                <th>Apr-Jun</th>
+                                                <th>Jul-Sep</th>
+                                                <th>Oct-Dec</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Aphids</td>
+                                                <td><i class="fas fa-circle text-success"></i></td>
+                                                <td><i class="fas fa-circle text-danger"></i></td>
+                                                <td><i class="fas fa-circle text-danger"></i></td>
+                                                <td><i class="fas fa-circle text-warning"></i></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Bollworm</td>
+                                                <td><i class="fas fa-circle text-muted"></i></td>
+                                                <td><i class="fas fa-circle text-warning"></i></td>
+                                                <td><i class="fas fa-circle text-danger"></i></td>
+                                                <td><i class="fas fa-circle text-warning"></i></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Whitefly</td>
+                                                <td><i class="fas fa-circle text-warning"></i></td>
+                                                <td><i class="fas fa-circle text-danger"></i></td>
+                                                <td><i class="fas fa-circle text-danger"></i></td>
+                                                <td><i class="fas fa-circle text-success"></i></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Leaf Miner</td>
+                                                <td><i class="fas fa-circle text-muted"></i></td>
+                                                <td><i class="fas fa-circle text-warning"></i></td>
+                                                <td><i class="fas fa-circle text-danger"></i></td>
+                                                <td><i class="fas fa-circle text-muted"></i></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Mealybug</td>
+                                                <td><i class="fas fa-circle text-warning"></i></td>
+                                                <td><i class="fas fa-circle text-danger"></i></td>
+                                                <td><i class="fas fa-circle text-danger"></i></td>
+                                                <td><i class="fas fa-circle text-warning"></i></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="px-3 pb-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        <span class="text-danger">High</span>,
+                                        <span class="text-warning">Medium</span>,
+                                        <span class="text-success">Low</span>,
+                                        <span class="text-muted">None</span> activity
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-shield-alt me-2"></i>Prevention Tips
+                            </div>
+                            <div class="card-body">
+                                <div class="pest-card mild">
+                                    <h6>Neem Oil Spray</h6>
+                                    <p class="mb-0">Mix 5ml neem oil in 1 liter of water and spray every 15 days</p>
+                                </div>
+                                <div class="pest-card mild">
+                                    <h6>Companion Planting</h6>
+                                    <p class="mb-0">Plant marigolds or garlic around crops to repel pests</p>
+                                </div>
+                                <div class="pest-card moderate">
+                                    <h6>Yellow Sticky Traps</h6>
+                                    <p class="mb-0">Use yellow sticky traps to monitor and control flying insects</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <i class="fas fa-book me-2"></i>Pest Encyclopedia
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="pest-card critical">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-bug fa-2x me-3"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h5 class="mt-0">Aphids</h5>
+                                            <p class="mb-1">Small sap-sucking insects that cause leaf curling and yellowing</p>
+                                            <span class="harm-level high">High Damage</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="pest-card critical">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-bug fa-2x me-3"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h5 class="mt-0">Bollworm</h5>
+                                            <p class="mb-1">Larvae that bore into fruits and buds of cotton, tomato, and chili</p>
+                                            <span class="harm-level high">High Damage</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="pest-card moderate">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-bug fa-2x me-3"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h5 class="mt-0">Whitefly</h5>
+                                            <p class="mb-1">Tiny white insects that suck plant sap and spread viruses</p>
+                                            <span class="harm-level medium">Medium Damage</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="pest-card moderate">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-bug fa-2x me-3"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h5 class="mt-0">Leaf Miner</h5>
+                                            <p class="mb-1">Larvae that tunnel inside leaves creating visible trails</p>
+                                            <span class="harm-level medium">Medium Damage</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h5>Krishi Pest Detect</h5>
+                    <p>Helping farmers identify and manage pests using AI and traditional knowledge.</p>
+                </div>
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white">Common Pests</a></li>
+                        <li><a href="#" class="text-white">Natural Remedies</a></li>
+                        <li><a href="#" class="text-white">Seasonal Calendar</a></li>
+                        <li><a href="#" class="text-white">Expert Help</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Contact Us</h5>
+                    <p><i class="fas fa-phone me-2"></i> 1800-123-4567</p>
+                    <p><i class="fas fa-envelope me-2"></i> support@krishipest.com</p>
+                </div>
+            </div>
+            <hr class="mt-4 bg-light">
+            <p class="text-center mb-0">© 2023 Krishi Pest Detect. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // DOM elements
+        const uploadArea = document.getElementById('uploadArea');
+        const imageUpload = document.getElementById('imageUpload');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        const previewImage = document.getElementById('previewImage');
+        const removeImageBtn = document.getElementById('removeImageBtn');
+        const commonPestSelect = document.getElementById('commonPestSelect');
+        const detectPestBtn = document.getElementById('detectPestBtn');
+        const initialMessage = document.getElementById('initialMessage');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const resultImage = document.getElementById('resultImage');
+        const pestName = document.getElementById('pestName');
+        const pestScientific = document.getElementById('pestScientific');
+        const pestDescription = document.getElementById('pestDescription');
+        const harmLevel = document.getElementById('harmLevel');
+        const affectedCrops = document.getElementById('affectedCrops');
+        const naturalSolutions = document.getElementById('naturalSolutions');
+
+        // Pest database
+        const pestDatabase = {
+            'aphids': {
+                name: 'Aphids',
+                scientific: 'Aphidoidea',
+                description: 'Small sap-sucking insects that cluster on young shoots and undersides of leaves. They cause yellowing, leaf curling, and stunted growth. They also secrete honeydew which promotes sooty mold growth.',
+                harm: 'high',
+                crops: ['Cotton', 'Tomato', 'Chili', 'Cabbage', 'Wheat'],
+                solutions: `
+                    <ul>
+                        <li>Spray neem oil solution (5ml per liter of water) every 10 days</li>
+                        <li>Release ladybugs or lacewings which are natural predators</li>
+                        <li>Use strong jet of water to dislodge aphids from plants</li>
+                        <li>Spray garlic-chili solution (blend 10g garlic + 10g chili in 1L water, strain and spray)</li>
+                        <li>Plant companion plants like marigold, garlic, or chives which repel aphids</li>
+                    </ul>
+                `,
+                image: 'https://images.unsplash.com/photo-1517188256206-ee10d3f83c26?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=600&q=80'
+            },
+            'bollworm': {
+                name: 'Cotton Bollworm',
+                scientific: 'Helicoverpa armigera',
+                description: 'Caterpillars that bore into fruits, buds and bolls of various crops. They cause direct damage to the yield and also invite secondary infections.',
+                harm: 'high',
+                crops: ['Cotton', 'Tomato', 'Chili', 'Maize', 'Chickpea'],
+                solutions: `
+                    <ul>
+                        <li>Set up pheromone traps to monitor and reduce adult population</li>
+                        <li>Release Trichogramma parasitoid wasps which attack bollworm eggs</li>
+                        <li>Apply neem seed kernel extract (5%) during evening hours</li>
+                        <li>Handpick and destroy infected fruits and larvae</li>
+                        <li>Spray Bacillus thuringiensis (Bt) formulation for biological control</li>
+                    </ul>
+                `,
+                image: 'https://images.unsplash.com/photo-1574613362874-9e30be722e09?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=600&q=80'
+            },
+            'whitefly': {
+                name: 'Whitefly',
+                scientific: 'Bemisia tabaci',
+                description: 'Tiny white insects that suck plant sap and cause yellowing, reduced growth, and honeydew secretion. They are also vectors for several plant viruses.',
+                harm: 'medium',
+                crops: ['Cotton', 'Tomato', 'Okra', 'Soybean', 'Cassava'],
+                solutions: `
+                    <ul>
+                        <li>Set up yellow sticky traps to monitor and control adult population</li>
+                        <li>Spray neem oil solution (5ml per liter of water) with soap as emulsifier</li>
+                        <li>Release Encarsia formosa parasitoid wasps for biological control</li>
+                        <li>Apply fish oil rosin soap solution (2.5g per liter of water)</li>
+                        <li>Practice crop rotation and avoid continuous cropping of susceptible crops</li>
+                    </ul>
+                `,
+                image: 'https://images.unsplash.com/photo-1558108546-7de5c0f5ce66?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=600&q=80'
+            },
+            'leafminer': {
+                name: 'Leaf Miner',
+                scientific: 'Liriomyza spp.',
+                description: 'Larvae that tunnel inside leaves, creating visible serpentine mines. This reduces photosynthesis and makes plants susceptible to diseases.',
+                harm: 'medium',
+                crops: ['Tomato', 'Potato', 'Bean', 'Pea', 'Onion'],
+                solutions: `
+                    <ul>
+                        <li>Remove and destroy mined leaves to break the life cycle</li>
+                        <li>Use neem oil spray to deter adults from laying eggs</li>
+                        <li>Release Diglyphus isaea parasitoid wasps for biological control</li>
+                        <li>Spray spinosad-based organic insecticide (follow label instructions)</li>
+                        <li>Practice deep ploughing after harvest to expose pupae to sunlight</li>
+                    </ul>
+                `,
+                image: 'https://images.unsplash.com/photo-1558108546-7de5c0f5ce66?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=600&q=80'
+            },
+            'mealybug': {
+                name: 'Mealybug',
+                scientific: 'Pseudococcidae',
+                description: 'Small, soft-bodied insects covered with white waxy material. They suck sap from plants and excrete honeydew, leading to sooty mold growth.',
+                harm: 'medium',
+                crops: ['Cotton', 'Cassava', 'Grapes', 'Citrus', 'Pomegranate'],
+                solutions: `
+                    <ul>
+                        <li>Drench soil with neem cake solution to control root mealybugs</li>
+                        <li>Release Cryptolaemus montrouzieri (mealybug destroyer) beetles</li>
+                        <li>Spray soap-water solution (10g soap per liter of water) directly on bugs</li>
+                        <li>Apply alcohol-soaked cotton directly on visible mealybugs</li>
+                        <li>Remove heavily infested plant parts and destroy them</li>
+                    </ul>
+                `,
+                image: 'https://images.unsplash.com/photo-1558108546-7de5c0f5ce66?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=600&q=80'
+            },
+            'thrips': {
+                name: 'Thrips',
+                scientific: 'Thysanoptera',
+                description: 'Tiny slender insects that rasp plant surface and suck the oozing sap. They cause silvery streaks on leaves and deformed growth.',
+                harm: 'medium',
+                crops: ['Onion', 'Cotton', 'Mango', 'Chili', 'Groundnut'],
+                solutions: `
+                    <ul>
+                        <li>Set up blue sticky traps to monitor and control population</li>
+                        <li>Spray neem oil solution with soap as emulsifier</li>
+                        <li>Release Amblyseius predatory mites for biological control</li>
+                        <li>Apply garlic-chili extract spray to repel thrips</li>
+                        <li>Maintain field sanitation and remove weed hosts</li>
+                    </ul>
+                `,
+                image: 'https://images.unsplash.com/photo-1558108546-7de5c0f5ce66?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=600&q=80'
+            },
+            'mites': {
+                name: 'Spider Mites',
+                scientific: 'Tetranychus urticae',
+                description: 'Tiny mites that suck chlorophyll from leaves, causing stippling, yellowing, and webbing. Severe infestation leads to leaf drop.',
+                harm: 'medium',
+                crops: ['Bean', 'Cotton', 'Tomato', 'Okra', 'Cucumber'],
+                solutions: `
+                    <ul>
+                        <li>Spray water with strong force to dislodge mites from plants</li>
+                        <li>Release Phytoseiulus persimilis predatory mites</li>
+                        <li>Apply sulfur dust or wettable sulfur solution</li>
+                        <li>Spray neem oil solution every 7-10 days</li>
+                        <li>Increase humidity around plants as mites thrive in dry conditions</li>
+                    </ul>
+                `,
+                image: 'https://images.unsplash.com/photo-1558108546-7de5c0f5ce66?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=600&q=80'
+            },
+            'locust': {
+                name: 'Locust',
+                scientific: 'Schistocerca gregaria',
+                description: 'Swarming grasshoppers that can devour entire fields rapidly. They are highly mobile and can cause widespread damage to crops.',
+                harm: 'high',
+                crops: ['All crops', 'Cereals', 'Pulses', 'Vegetables', 'Fodder'],
+                solutions: `
+                    <ul>
+                        <li>Report to local agriculture department for coordinated control</li>
+                        <li>Use biopesticides like Metarhizium anisopliae fungus</li>
+                        <li>Dig trenches around fields to trap hoppers (young locusts)</li>
+                        <li>Use smoke to deter swarms from settling in fields</li>
+                        <li>Make noise using drums or utensils to scare away locusts</li>
+                    </ul>
+                `,
+                image: 'https://images.unsplash.com/photo-1589650493028-52b65833a3c9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=600&q=80'
+            }
+        };
+
+        // Event listeners
+        uploadArea.addEventListener('click', function() {
+            imageUpload.click();
+        });
+
+        imageUpload.addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    imagePreviewContainer.classList.remove('d-none');
+                    detectPestBtn.disabled = false;
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+
+        removeImageBtn.addEventListener('click', function() {
+            imageUpload.value = '';
+            imagePreviewContainer.classList.add('d-none');
+            detectPestBtn.disabled = true;
+        });
+
+        commonPestSelect.addEventListener('change', function() {
+            if (this.value) {
+                detectPestBtn.disabled = false;
+                // If a common pest is selected, show its image
+                previewImage.src = pestDatabase[this.value].image;
+                imagePreviewContainer.classList.remove('d-none');
+            } else {
+                detectPestBtn.disabled = true;
+            }
+        });
+
+        detectPestBtn.addEventListener('click', function() {
+            // Show loading state
+            detectPestBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Detecting...';
+            detectPestBtn.disabled = true;
+            
+            // Simulate AI detection process
+            setTimeout(function() {
+                let detectedPest;
+                
+                // Check if a common pest was selected
+                if (commonPestSelect.value) {
+                    detectedPest = commonPestSelect.value;
+                } else {
+                    // For image uploads, randomly select a pest for demonstration
+                    // In a real application, this would be the AI detection result
+                    const pestKeys = Object.keys(pestDatabase);
+                    detectedPest = pestKeys[Math.floor(Math.random() * pestKeys.length)];
+                }
+                
+                // Display results
+                displayPestResult(detectedPest);
+                
+                // Reset button
+                detectPestBtn.innerHTML = '<i class="fas fa-search me-2"></i>Detect Pest';
+                detectPestBtn.disabled = false;
+            }, 2000);
+        });
+
+        // Function to display pest results
+        function displayPestResult(pestKey) {
+            const pest = pestDatabase[pestKey];
+            
+            // Update result elements
+            resultImage.src = pest.image;
+            pestName.textContent = pest.name;
+            pestScientific.textContent = pest.scientific;
+            pestDescription.textContent = pest.description;
+            
+            // Update harm level
+            harmLevel.textContent = pest.harm === 'high' ? 'High Damage' : 
+                                  pest.harm === 'medium' ? 'Medium Damage' : 'Low Damage';
+            harmLevel.className = 'harm-level ' + 
+                (pest.harm === 'high' ? 'high' : pest.harm === 'medium' ? 'medium' : 'low');
+            
+            // Update affected crops
+            affectedCrops.innerHTML = '';
+            pest.crops.forEach(crop => {
+                const span = document.createElement('span');
+                span.className = 'crop-type';
+                span.textContent = crop;
+                affectedCrops.appendChild(span);
+            });
+            
+            // Update natural solutions
+            naturalSolutions.innerHTML = pest.solutions;
+            
+            // Show results and hide initial message
+            initialMessage.classList.add('d-none');
+            resultsContainer.classList.remove('d-none');
+            
+            // Save to recent detections
+            saveToRecentDetections(pest);
+        }
+
+        // Function to save detection to history
+        function saveToRecentDetections(pest) {
+            let recentDetections = JSON.parse(localStorage.getItem('recentDetections')) || [];
+            
+            // Add new detection to beginning of array
+            recentDetections.unshift({
+                name: pest.name,
+                scientific: pest.scientific,
+                timestamp: new Date().toISOString(),
+                image: pest.image
+            });
+            
+            // Keep only the last 5 detections
+            if (recentDetections.length > 5) {
+                recentDetections = recentDetections.slice(0, 5);
+            }
+            
+            // Save back to localStorage
+            localStorage.setItem('recentDetections', JSON.stringify(recentDetections));
+            
+            // Update the UI
+            updateRecentDetectionsUI();
+        }
+
+        // Function to update recent detections UI
+        function updateRecentDetectionsUI() {
+            const recentDetectionsContainer = document.querySelector('.card-body:has(.alert-info)');
+            const alertElement = recentDetectionsContainer.querySelector('.alert');
+            let recentDetections = JSON.parse(localStorage.getItem('recentDetections')) || [];
+            
+            if (recentDetections.length === 0) {
+                alertElement.classList.remove('d-none');
+                return;
+            }
+            
+            alertElement.classList.add('d-none');
+            
+            // Clear any existing list
+            const existingList = recentDetectionsContainer.querySelector('ul');
+            if (existingList) {
+                existingList.remove();
+            }
+            
+            // Create new list
+            const list = document.createElement('ul');
+            list.className = 'list-group list-group-flush';
+            
+            recentDetections.forEach(detection => {
+                const listItem = document.createElement('li');
+                listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                
+                const formattedDate = new Date(detection.timestamp).toLocaleDateString('en-IN', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+                
+                listItem.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <img src="${detection.image}" alt="${detection.name}" class="rounded me-3" width="40" height="40">
+                        <div>
+                            <div class="fw-bold">${detection.name}</div>
+                            <small class="text-muted">${detection.scientific}</small>
+                        </div>
+                    </div>
+                    <small class="text-muted">${formattedDate}</small>
+                `;
+                
+                list.appendChild(listItem);
+            });
+            
+            recentDetectionsContainer.appendChild(list);
+        }
+
+        // Camera capture functionality
+        document.getElementById('captureBtn').addEventListener('click', function() {
+            // Check if browser supports mediaDevices
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert('Camera access is not supported by your browser. Please upload an image instead.');
+                return;
+            }
+            
+            // Create a modal for camera capture
+            const cameraModal = document.createElement('div');
+            cameraModal.className = 'modal fade';
+            cameraModal.innerHTML = `
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Capture Pest Image</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <video id="cameraFeed" width="100%" autoplay playsinline></video>
+                            <canvas id="captureCanvas" class="d-none"></canvas>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary" id="takePictureBtn">Capture</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(cameraModal);
+            
+            const modal = new bootstrap.Modal(cameraModal);
+            modal.show();
+            
+            // Access camera
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    const video = cameraModal.querySelector('#cameraFeed');
+                    video.srcObject = stream;
+                    
+                    // Capture image when button is clicked
+                    cameraModal.querySelector('#takePictureBtn').addEventListener('click', function() {
+                        const canvas = cameraModal.querySelector('#captureCanvas');
+                        const context = canvas.getContext('2d');
+                        
+                        // Set canvas dimensions to match video
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        
+                        // Draw current video frame to canvas
+                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        
+                        // Convert canvas to data URL
+                        const imageDataUrl = canvas.toDataURL('image/png');
+                        
+                        // Set as preview image
+                        previewImage.src = imageDataUrl;
+                        imagePreviewContainer.classList.remove('d-none');
+                        detectPestBtn.disabled = false;
+                        
+                        // Stop video stream
+                        stream.getTracks().forEach(track => track.stop());
+                        
+                        // Close modal
+                        modal.hide();
+                        cameraModal.remove();
+                    });
+                })
+                .catch(function(error) {
+                    alert('Unable to access camera: ' + error.message);
+                    modal.hide();
+                    cameraModal.remove();
+                });
+                
+            // Clean up when modal is closed
+            cameraModal.addEventListener('hidden.bs.modal', function() {
+                const video = cameraModal.querySelector('#cameraFeed');
+                if (video.srcObject) {
+                    video.srcObject.getTracks().forEach(track => track.stop());
+                }
+                cameraModal.remove();
+            });
+        });
+
+        // Initialize recent detections on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateRecentDetectionsUI();
+            
+            // Enable drag and drop for upload area
+            const uploadArea = document.getElementById('uploadArea');
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                uploadArea.classList.add('bg-light');
+            }
+            
+            function unhighlight() {
+                uploadArea.classList.remove('bg-light');
+            }
+            
+            uploadArea.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if (files.length) {
+                    imageUpload.files = files;
+                    const event = new Event('change');
+                    imageUpload.dispatchEvent(event);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
